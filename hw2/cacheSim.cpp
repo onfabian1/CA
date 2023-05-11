@@ -97,10 +97,10 @@ int main(int argc, char **argv) {
 		
 		if (operation == 'r') {
 			L1Cache.read(num);
-		}/*
+		}
 		else if(operation == 'w') {
-			L1Cache.write(cutAddress);
-		}*/
+			L1Cache.write(num);
+		}
 			
 		
 	}
