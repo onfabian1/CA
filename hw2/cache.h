@@ -28,18 +28,16 @@ class CacheBlock {
 
 public:
 
-    int tag; //block number
+    	int tag; //block number
 
-	bool valid;
+	bool valid = true;
 
 	bool dirty = false;
-
+	unsigned long int addr;
 	int lru = 1;
-
-	CacheBlock(int num) {
-
+	CacheBlock(int num, unsigned long int address) {
+		addr = address;
 		tag = num;
-
 	}
 
 };
@@ -54,7 +52,7 @@ private:
 
 public:
 
-    unordered_map<int, CacheBlock> blocks;
+    unordered_map<int, CacheBlock> blocks; // key = setIndex, val = block
 
 	CacheSet(int setSize, int assoc) {
 
@@ -68,7 +66,7 @@ public:
 class Cache {
 
 private:
-
+    
     int setSize;                // number of sets in the cache
 
     int assoc;                  // associativity of the cache (WAYs)
@@ -82,21 +80,25 @@ private:
     int wrAlloc;         		// write allocate policy
 
     Cache* lowerCache;          // pointer to the lower-level cache (or nullptr for L2 cache)
+    //Cache* upperCache;          // pointer to the upper-level cache (or nullptr for L1 cache)
 
     vector<CacheSet> sets;      // vector of cache sets
 
     int tagSize;				// number of tags in the cache
 
     int maxLruSize;				// number of LRU values
+    int maxCacheSize;
 
 
 
 public:
+	char operation;
 	int hitCount = 0;
 	int totalLatency = 0;
 	int missCount = 0;
-
-    Cache(int setSize, int assoc, int blockSize, int hitLatency, int missLatency, int writeAllocate, Cache* lowerCache);
+	bool wbFlag = false;
+	int setIndexCache;
+    Cache(int cacheSize, int setSize, int assoc, int blockSize, int hitLatency, int missLatency, int writeAllocate, Cache* lowerCache);
 
 	~Cache();
 
@@ -108,13 +110,21 @@ public:
 
 	void updateHitRate(bool hit);
 
-	void updateLruPolicy(int setIndex, int counterBlocksInLine, CacheBlock presentBlock);
+	void updateLruPolicy(int setIndex, int counterBlocksInLine, CacheBlock* presentBlock);
 
 	void missHandler(uint32_t setIndex, uint32_t tagIndex, int counterBlocksInLine, unsigned long int address);
 
 	void printStats();
+	
+	double MissRate();
+
+	double AvgAccTime();
 };
+/*
+// Globals
+extern int hitCount;
+extern int totalLatency = 0;
+extern int missCount = 0;
 
-
-
+*/
 #endif  // CACHE_H_

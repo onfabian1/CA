@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
 	}
 	/* Our Code */
 	
-	Cache L2Cache(L2Size - (BSize + L2Assoc), L2Assoc, BSize, L2Cyc, MemCyc, WrAlloc, nullptr); // In log2
-	Cache L1Cache(L1Size - (BSize + L1Assoc), L1Assoc, BSize, L1Cyc, L2Cyc, WrAlloc, &L2Cache); // In log2
+	Cache L2Cache(L2Size, L2Size - (BSize + L2Assoc), L2Assoc, BSize, L2Cyc, MemCyc, WrAlloc, nullptr); // In log2
+	Cache L1Cache(L1Size, L1Size - (BSize + L1Assoc), L1Assoc, BSize, L1Cyc, L2Cyc, WrAlloc, &L2Cache); // In log2
 
 	/* End Our Code */
 	
@@ -96,22 +96,26 @@ int main(int argc, char **argv) {
 		//cout << " (dec) " << num << endl;
 		
 		if (operation == 'r') {
+			L1Cache.operation = operation;
+			L2Cache.operation = operation;
 			L1Cache.read(num);
 		}
 		else if(operation == 'w') {
+			L1Cache.operation = operation;
+			L2Cache.operation = operation;
 			L1Cache.write(num);
 		}
 			
 		
 	}
 
-	//double L1MissRate = L1Cache.L1MissRate;
-	//double L2MissRate = L2Cache.L2MissRate;
-	//double avgAccTime = <implement>;
-
-	//printf("L1miss=%.03f ", L1MissRate);
-	//printf("L2miss=%.03f ", L2MissRate);
-	//printf("AccTimeAvg=%.03f\n", avgAccTime);
+	double L1MissRate = L1Cache.MissRate();
+	double L2MissRate = L2Cache.MissRate();
+	double avgAccTime = L1Cache.AvgAccTime();
+	
+	printf("L1miss=%.03f ", L1MissRate);
+	printf("L2miss=%.03f ", L2MissRate);
+	printf("AccTimeAvg=%.03f\n", avgAccTime);
 
 	return 0;
 }
